@@ -1,40 +1,8 @@
-const cardGrid = document.getElementById("card-grid");
+/* ============================================================
+   MidnightRose v2 — main.js
+   ============================================================ */
 
-async function loadCards() {
-  if (!cardGrid) return;
-
-  try {
-    const response = await fetch("./data/girls.json");
-    if (!response.ok) {
-      throw new Error("Failed to load data/girls.json");
-    }
-
-    const { profiles } = await response.json();
-    if (!Array.isArray(profiles)) {
-      throw new Error("Invalid JSON format: profiles must be an array");
-    }
-
-    cardGrid.innerHTML = profiles
-      .filter((item) => item.visible !== false)
-      .map(
-        (item) => `
-          <a class="card" href="${item.link}" target="_blank" rel="noopener noreferrer">
-            <figure>
-              <img src="${item.image}" alt="${item.name}" loading="lazy" />
-            </figure>
-            <figcaption>${item.name}</figcaption>
-          </a>
-        `
-      )
-      .join("");
-  } catch (error) {
-    console.error(error);
-    cardGrid.innerHTML = "<p>读取卡片数据失败，请检查 data/girls.json。</p>";
-  }
-}
-
-loadCards();
-
+// Back to top button
 function setupBackToTop() {
   const btn = document.createElement("button");
   btn.className = "back-to-top";
@@ -44,7 +12,7 @@ function setupBackToTop() {
   document.body.appendChild(btn);
 
   const onScroll = () => {
-    btn.classList.toggle("visible", window.scrollY > 300);
+    btn.classList.toggle("visible", window.scrollY > 320);
   };
   window.addEventListener("scroll", onScroll, { passive: true });
   onScroll();
@@ -54,39 +22,27 @@ function setupBackToTop() {
   });
 }
 
-setupBackToTop();
+// Scroll reveal animation
+function setupScrollReveal() {
+  const els = document.querySelectorAll(".reveal");
+  if (!els.length) return;
 
-function setupFeatureIconLinks() {
-  const icons = document.querySelectorAll(".feature-grid article");
-  const cards = document.querySelectorAll(".feature-cards .feature-card");
-  if (!icons.length || !cards.length) return;
-
-  icons.forEach((icon, index) => {
-    const target = cards[index];
-    if (!target) return;
-    icon.setAttribute("role", "button");
-    icon.setAttribute("tabindex", "0");
-
-    const goToCard = () => {
-      target.scrollIntoView({
-        behavior: "smooth",
-        block: "nearest",
-        inline: "center",
+  const obs = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("visible");
+          obs.unobserve(entry.target);
+        }
       });
-    };
+    },
+    { threshold: 0.12, rootMargin: "0px 0px -60px 0px" }
+  );
 
-    icon.addEventListener("click", goToCard);
-    icon.addEventListener("keydown", (event) => {
-      if (event.key === "Enter" || event.key === " ") {
-        event.preventDefault();
-        goToCard();
-      }
-    });
-  });
+  els.forEach((el) => obs.observe(el));
 }
 
-setupFeatureIconLinks();
-
+// Count up stats
 function setupCountUp() {
   const elements = document.querySelectorAll(".stat-num");
   if (!elements.length) return;
@@ -137,4 +93,6 @@ function setupCountUp() {
   elements.forEach((el) => observer.observe(el));
 }
 
+setupBackToTop();
+setupScrollReveal();
 setupCountUp();
