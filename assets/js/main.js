@@ -88,9 +88,7 @@ function setupFeatureIconLinks() {
 setupFeatureIconLinks();
 
 function setupCountUp() {
-  const elements = document.querySelectorAll(
-    ".final-stats .stat-num, .stats-grid strong"
-  );
+  const elements = document.querySelectorAll(".stat-num");
   if (!elements.length) return;
 
   const targets = new Map();
